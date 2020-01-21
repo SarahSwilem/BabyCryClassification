@@ -68,6 +68,7 @@ def accuracy_metric(actual, predicted):
 			correct += 1
 	return correct / float(len(actual)) * 100.0
 
+
 # Evaluate an algorithm using a cross validation split
 def evaluate_algorithm(dataset, algorithm, n_folds, *args):
 	folds = cross_validation_split(dataset, n_folds)
@@ -122,8 +123,8 @@ def k_nearest_neighbors(train, test, num_neighbors):
 	return(predictions)
 
 # Train the kNN on the Baby Chillanto dataset
-seed(1)
-filename = 'Features.csv'
+seed(0)
+filename = 'Data.csv'
 dataset = load_csv(filename)
 for i in range(len(dataset[0])-1):
 	str_column_to_float(dataset, i)
@@ -131,23 +132,7 @@ for i in range(len(dataset[0])-1):
 str_column_to_int(dataset, len(dataset[0])-1)
 # evaluate algorithm
 n_folds = 5
-num_neighbors = 5
+num_neighbors = 3
 scores = evaluate_algorithm(dataset, k_nearest_neighbors, n_folds, num_neighbors)
 print('Scores: %s' % scores)
 print('Mean Accuracy: %.3f%%' % (sum(scores)/float(len(scores))))
-
-import _pickle as cPickle
-
-def pickle_model(model, modelname):
-    with open('models/' + str(modelname) + '.pkl', 'wb') as f:
-        return cPickle.dump(model, f)
-
-model = evaluate_algorithm(dataset, k_nearest_neighbors, n_folds, num_neighbors)
-evaluate_algorithm(dataset, k_nearest_neighbors, n_folds, num_neighbors)
-pickle_model(model, "KNN")
-
-def getModel(pickle_path):
-    with open(pickle_path, 'rb') as f:
-        return cPickle.load(f)
-    
-model = getModel("models/KNN.pkl")

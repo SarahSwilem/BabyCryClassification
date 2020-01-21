@@ -1,32 +1,20 @@
-import pandas as pd
-from   sklearn.model_selection import train_test_split
-filename = 'Features.csv'
-dataset = pd.read_csv(filename)
-X = dataset.iloc[:, 0:26].values
-y = dataset.iloc[:, 26].values
-
-#Make a Test-Train-Split of the data
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20)
-
-from sklearn.preprocessing import StandardScaler
-scaler = StandardScaler()
-scaler.fit(X_train)
-
-X_train = scaler.transform(X_train)
-X_test = scaler.transform(X_test)
-
+from sklearn.model_selection import train_test_split, KFold, cross_val_predict
 from sklearn.neighbors import KNeighborsClassifier
-classifier = KNeighborsClassifier(n_neighbors=7)
-classifier.fit(X_train, y_train)
-y_pred = classifier.predict(X_test)
+from sklearn.metrics import confusion_matrix, classification_report,accuracy_score
+import pandas as pd
 
-from sklearn.metrics import classification_report, confusion_matrix
-print(confusion_matrix(y_test, y_pred))
-print(classification_report(y_test, y_pred))
 
-import _pickle as cPickle
-def pickle_model(model, modelname):
-    with open('models/' + str(modelname) + '.pkl', 'wb') as f:
-        return cPickle.dump(model, f)
-model = classifier
-pickle_model(model, "myKNN")
+filename = 'Data.csv'
+# Remember to remove the header in this case!
+# otherwise, you are going to miss a sample from the dataset!
+dataset = pd.read_csv(filename, header=None)
+
+X_data = dataset.iloc[:, 0:12].values
+y_label = dataset.iloc[:, 12].values
+
+knn = KNeighborsClassifier(n_neighbors=3)
+y_pred = cross_val_predict(knn, X_data, y_label, cv=5) # This function does it all for you!
+print(confusion_matrix(y_label, y_pred))
+print(classification_report(y_label, y_pred))
+print(accuracy_score(y_label, y_pred))
+
